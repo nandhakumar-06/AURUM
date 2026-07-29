@@ -1,0 +1,34 @@
+name: Retrain forecast model
+
+on:
+  schedule:
+    # Runs once a day at 02:00 UTC. Markets need a closed day of data to be meaningful.
+    - cron: "0 2 * * *"
+  workflow_dispatch: {}   # lets you trigger it manually from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run training + forecast
+        run: python gold_silver_forecast.py
+
+      - name: Commit updated forecast
+        run: |
+          git config user.name "forecast-bot"
+          git config user.email "actions@github.com"
+          git add forecast_output.json
+          git diff --cached --quiet && echo "No changes" || git commit -m "Daily forecast update"
+          git push
