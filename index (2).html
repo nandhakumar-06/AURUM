@@ -381,25 +381,25 @@ const FALLBACK_DATA = {
   sample: true,
   metals: {
     gold: {
-      ticker: "GC=F", current_price: 2342.80, model: "LSTM (60-day lookback)",
-      rmse: 8.42, mape_percent: 0.62,
-      history: [2288,2301,2295,2310,2334,2318,2340,2355,2342,2360,2349,2371,2342.80],
+      ticker: "GC=F", current_price: 194542, model: "LSTM (60-day lookback)",
+      rmse: 698, mape_percent: 0.62,
+      history: [189904,190882,189662,191662,193692,192292,194120,195565,194344,195880,195014,196753,194542],
       forecast: [
-        {date:"D+1", predicted_price:2350.10},{date:"D+2", predicted_price:2358.40},
-        {date:"D+3", predicted_price:2352.20},{date:"D+4", predicted_price:2366.75},
-        {date:"D+5", predicted_price:2374.30},{date:"D+6", predicted_price:2381.05},
-        {date:"D+7", predicted_price:2388.50}
+        {date:"D+1", predicted_price:195108},{date:"D+2", predicted_price:195797},
+        {date:"D+3", predicted_price:195283},{date:"D+4", predicted_price:196482},
+        {date:"D+5", predicted_price:197109},{date:"D+6", predicted_price:197669},
+        {date:"D+7", predicted_price:198265}
       ]
     },
     silver: {
-      ticker: "SI=F", current_price: 28.45, model: "LSTM (60-day lookback)",
-      rmse: 0.31, mape_percent: 1.08,
-      history: [27.1,27.6,27.3,28.0,27.8,28.3,28.6,28.2,28.5,28.7,28.4,28.6,28.45],
+      ticker: "SI=F", current_price: 2361, model: "LSTM (60-day lookback)",
+      rmse: 26, mape_percent: 1.08,
+      history: [2249,2291,2266,2324,2307,2349,2374,2341,2366,2382,2357,2374,2361],
       forecast: [
-        {date:"D+1", predicted_price:28.55},{date:"D+2", predicted_price:28.70},
-        {date:"D+3", predicted_price:28.62},{date:"D+4", predicted_price:28.85},
-        {date:"D+5", predicted_price:28.95},{date:"D+6", predicted_price:29.05},
-        {date:"D+7", predicted_price:29.12}
+        {date:"D+1", predicted_price:2370},{date:"D+2", predicted_price:2382},
+        {date:"D+3", predicted_price:2376},{date:"D+4", predicted_price:2395},
+        {date:"D+5", predicted_price:2403},{date:"D+6", predicted_price:2412},
+        {date:"D+7", predicted_price:2417}
       ]
     }
   }
@@ -456,8 +456,8 @@ function renderHistChart(values){
 }
 
 function fmt(n, currency=true){
-  const opts = currency ? {style:'currency', currency:'USD'} : {};
-  return new Intl.NumberFormat('en-US', {...opts, minimumFractionDigits:2, maximumFractionDigits:2}).format(n);
+  const opts = currency ? {style:'currency', currency:'INR'} : {};
+  return new Intl.NumberFormat('en-IN', {...opts, minimumFractionDigits:2, maximumFractionDigits:2}).format(n);
 }
 
 function populate(data){

@@ -37,6 +37,14 @@ def fetch_data(ticker: str) -> pd.DataFrame:
     df.columns = ["close"]
     return df
 
+def fetch_usd_inr_rate() -> float:
+    """Live USD->INR rate. Falls back to a fixed approximate rate if the fetch fails."""
+    try:
+        rate_df = yf.download("USDINR=X", period="5d", interval="1d", progress=False)
+        return float(rate_df["Close"].dropna().iloc[-1])
+    except Exception:
+        return 83.0
+
 # ---------------------------------------------------------------
 # 2. PREPARE SEQUENCES
 # ---------------------------------------------------------------
@@ -130,7 +138,9 @@ def forecast_future(model, scaler, df: pd.DataFrame, days: int):
 # MAIN
 # ---------------------------------------------------------------
 def main():
-    output = {"generated_at": datetime.utcnow().isoformat(), "metals": {}}
+    output = {"generated_at": datetime.utcnow().isoformat(), "currency": "INR", "metals": {}}
+    usd_to_inr = fetch_usd_inr_rate()
+    print(f"USD -> INR rate: {usd_to_inr:.2f}")
 
     for name, ticker in TICKERS.items():
         print(f"\n=== {name.upper()} ({ticker}) ===")
@@ -141,17 +151,24 @@ def main():
         print(f"Model performance -> RMSE: {rmse:.2f} | MAPE: {mape:.2f}%")
 
         forecast = forecast_future(model, scaler, df, FORECAST_DAYS)
-        current_price = round(float(df["close"].iloc[-1]), 2)
-        recent_history = [round(float(v), 2) for v in df["close"].tail(13).tolist()]
+
+        # Convert everything from USD to INR using the live exchange rate
+        current_price = round(float(df["close"].iloc[-1]) * usd_to_inr, 2)
+        recent_history = [round(float(v) * usd_to_inr, 2) for v in df["close"].tail(13).tolist()]
+        forecast_inr = [
+            {"date": f["date"], "predicted_price": round(f["predicted_price"] * usd_to_inr, 2)}
+            for f in forecast
+        ]
+        rmse_inr = round(rmse * usd_to_inr, 2)
 
         output["metals"][name] = {
             "ticker": ticker,
             "current_price": current_price,
             "model": "LSTM (60-day lookback)",
-            "rmse": round(rmse, 2),
-            "mape_percent": round(mape, 2),
+            "rmse": rmse_inr,
+            "mape_percent": round(mape, 2),  # percentage error is currency-independent
             "history": recent_history,
-            "forecast": forecast,
+            "forecast": forecast_inr,
         }
 
     with open("forecast_output.json", "w") as f:
