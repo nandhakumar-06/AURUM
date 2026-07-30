@@ -1,0 +1,109 @@
+{
+  "generated_at": "2026-07-30T06:29:56.958776",
+  "metals": {
+    "gold": {
+      "ticker": "GC=F",
+      "current_price": 4090.8,
+      "model": "LSTM (60-day lookback)",
+      "rmse": 144.23,
+      "mape_percent": 2.35,
+      "history": [
+        4061.1,
+        4044.0,
+        3985.6,
+        4012.7,
+        4010.3,
+        4071.1,
+        4146.9,
+        4046.6,
+        4067.6,
+        4074.5,
+        4036.3,
+        4034.7,
+        4090.8
+      ],
+      "forecast": [
+        {
+          "date": "2026-07-31",
+          "predicted_price": 4013.76
+        },
+        {
+          "date": "2026-08-03",
+          "predicted_price": 4011.69
+        },
+        {
+          "date": "2026-08-04",
+          "predicted_price": 4007.47
+        },
+        {
+          "date": "2026-08-05",
+          "predicted_price": 4001.92
+        },
+        {
+          "date": "2026-08-06",
+          "predicted_price": 3995.54
+        },
+        {
+          "date": "2026-08-07",
+          "predicted_price": 3988.66
+        },
+        {
+          "date": "2026-08-10",
+          "predicted_price": 3981.46
+        }
+      ]
+    },
+    "silver": {
+      "ticker": "SI=F",
+      "current_price": 57.4,
+      "model": "LSTM (60-day lookback)",
+      "rmse": 5.59,
+      "mape_percent": 5.42,
+      "history": [
+        58.77,
+        57.11,
+        55.9,
+        56.04,
+        56.8,
+        58.83,
+        60.02,
+        57.8,
+        58.66,
+        58.47,
+        57.3,
+        57.86,
+        57.4
+      ],
+      "forecast": [
+        {
+          "date": "2026-07-31",
+          "predicted_price": 56.43
+        },
+        {
+          "date": "2026-08-03",
+          "predicted_price": 56.36
+        },
+        {
+          "date": "2026-08-04",
+          "predicted_price": 56.25
+        },
+        {
+          "date": "2026-08-05",
+          "predicted_price": 56.11
+        },
+        {
+          "date": "2026-08-06",
+          "predicted_price": 55.96
+        },
+        {
+          "date": "2026-08-07",
+          "predicted_price": 55.79
+        },
+        {
+          "date": "2026-08-10",
+          "predicted_price": 55.61
+        }
+      ]
+    }
+  }
+}
