@@ -15,9 +15,14 @@ import pandas as pd
 import yfinance as yf
 from datetime import datetime, timedelta
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout
-from tensorflow.keras.callbacks import EarlyStopping
+try:
+    from tensorflow.keras.models import Sequential
+    from tensorflow.keras.layers import LSTM, Dense, Dropout
+    from tensorflow.keras.callbacks import EarlyStopping
+    HAS_TF = True
+except ImportError:
+    HAS_TF = False
+    from sklearn.neural_network import MLPRegressor
 
 # ---------------------------------------------------------------
 # CONFIG
@@ -56,50 +61,55 @@ def make_sequences(values: np.ndarray, lookback: int):
     return np.array(X), np.array(y)
 
 # ---------------------------------------------------------------
-# 3. BUILD MODEL
-# ---------------------------------------------------------------
-def build_model(lookback: int) -> Sequential:
-    model = Sequential([
-        LSTM(64, return_sequences=True, input_shape=(lookback, 1)),
-        Dropout(0.2),
-        LSTM(32, return_sequences=False),
-        Dropout(0.2),
-        Dense(16, activation="relu"),
-        Dense(1),
-    ])
-    model.compile(optimizer="adam", loss="mse")
-    return model
-
-# ---------------------------------------------------------------
-# 4. TRAIN + EVALUATE
+# 3. BUILD & TRAIN MODEL
 # ---------------------------------------------------------------
 def train_and_evaluate(df: pd.DataFrame):
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled = scaler.fit_transform(df.values)
 
     X, y = make_sequences(scaled, LOOKBACK)
-    X = X.reshape((X.shape[0], X.shape[1], 1))
 
     split = int(len(X) * 0.9)
-    X_train, X_test = X[:split], X[split:]
-    y_train, y_test = y[:split], y[split:]
 
-    model = build_model(LOOKBACK)
-    early_stop = EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True)
+    if HAS_TF:
+        X_tf = X.reshape((X.shape[0], X.shape[1], 1))
+        X_train, X_test = X_tf[:split], X_tf[split:]
+        y_train, y_test = y[:split], y[split:]
 
-    model.fit(
-        X_train, y_train,
-        validation_data=(X_test, y_test),
-        epochs=EPOCHS,
-        batch_size=BATCH_SIZE,
-        callbacks=[early_stop],
-        verbose=0,
-    )
+        model = Sequential([
+            LSTM(64, return_sequences=True, input_shape=(LOOKBACK, 1)),
+            Dropout(0.2),
+            LSTM(32, return_sequences=False),
+            Dropout(0.2),
+            Dense(16, activation="relu"),
+            Dense(1),
+        ])
+        model.compile(optimizer="adam", loss="mse")
+        early_stop = EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True)
 
-    # Evaluation metrics (RMSE, MAPE) on test split
-    preds = model.predict(X_test, verbose=0)
-    preds_actual = scaler.inverse_transform(preds)
-    y_test_actual = scaler.inverse_transform(y_test.reshape(-1, 1))
+        model.fit(
+            X_train, y_train,
+            validation_data=(X_test, y_test),
+            epochs=EPOCHS,
+            batch_size=BATCH_SIZE,
+            callbacks=[early_stop],
+            verbose=0,
+        )
+
+        preds = model.predict(X_test, verbose=0)
+        preds_actual = scaler.inverse_transform(preds)
+        y_test_actual = scaler.inverse_transform(y_test.reshape(-1, 1))
+    else:
+        # Fallback to Scikit-Learn MLP (Neural Network) for Python versions without TensorFlow wheels
+        X_train, X_test = X[:split], X[split:]
+        y_train, y_test = y[:split], y[split:]
+
+        model = MLPRegressor(hidden_layer_sizes=(64, 32), max_iter=200, random_state=42, early_stopping=True)
+        model.fit(X_train, y_train)
+
+        preds = model.predict(X_test).reshape(-1, 1)
+        preds_actual = scaler.inverse_transform(preds)
+        y_test_actual = scaler.inverse_transform(y_test.reshape(-1, 1))
 
     rmse = float(np.sqrt(np.mean((preds_actual - y_test_actual) ** 2)))
     mape = float(np.mean(np.abs((y_test_actual - preds_actual) / y_test_actual)) * 100)
@@ -107,17 +117,24 @@ def train_and_evaluate(df: pd.DataFrame):
     return model, scaler, rmse, mape
 
 # ---------------------------------------------------------------
-# 5. FORECAST NEXT N DAYS (recursive)
+# 4. FORECAST NEXT N DAYS (recursive)
 # ---------------------------------------------------------------
 def forecast_future(model, scaler, df: pd.DataFrame, days: int):
     scaled = scaler.transform(df.values)
-    window = scaled[-LOOKBACK:].reshape(1, LOOKBACK, 1)
 
     preds_scaled = []
-    for _ in range(days):
-        next_pred = model.predict(window, verbose=0)[0, 0]
-        preds_scaled.append(next_pred)
-        window = np.append(window[:, 1:, :], [[[next_pred]]], axis=1)
+    if HAS_TF:
+        window = scaled[-LOOKBACK:].reshape(1, LOOKBACK, 1)
+        for _ in range(days):
+            next_pred = model.predict(window, verbose=0)[0, 0]
+            preds_scaled.append(next_pred)
+            window = np.append(window[:, 1:, :], [[[next_pred]]], axis=1)
+    else:
+        window = scaled[-LOOKBACK:].reshape(1, LOOKBACK)
+        for _ in range(days):
+            next_pred = model.predict(window)[0]
+            preds_scaled.append(next_pred)
+            window = np.append(window[:, 1:], [[next_pred]], axis=1)
 
     preds = scaler.inverse_transform(np.array(preds_scaled).reshape(-1, 1)).flatten()
 
