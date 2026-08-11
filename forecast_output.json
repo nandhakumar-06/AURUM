@@ -1,15 +1,14 @@
 {
-  "generated_at": "2026-08-10T04:00:37.426393",
+  "generated_at": "2026-08-11T03:48:49.305182",
   "currency": "INR",
   "metals": {
     "gold": {
       "ticker": "GC=F",
-      "current_price": 360278.12,
+      "current_price": 371690.62,
       "model": "LSTM (60-day lookback)",
-      "rmse": 13975.69,
-      "mape_percent": 2.76,
+      "rmse": 13604.23,
+      "mape_percent": 2.68,
       "history": [
-        344192.69,
         335867.81,
         337610.81,
         338183.5,
@@ -21,47 +20,47 @@
         339918.19,
         352401.38,
         352086.0,
-        360278.12
+        360278.12,
+        371690.62
       ],
       "forecast": [
         {
-          "date": "2026-08-10",
-          "predicted_price": 335075.15
-        },
-        {
           "date": "2026-08-11",
-          "predicted_price": 335950.8
+          "predicted_price": 339493.24
         },
         {
           "date": "2026-08-12",
-          "predicted_price": 336465.4
+          "predicted_price": 341168.18
         },
         {
           "date": "2026-08-13",
-          "predicted_price": 336687.84
+          "predicted_price": 342253.82
         },
         {
           "date": "2026-08-14",
-          "predicted_price": 336686.18
+          "predicted_price": 342882.13
         },
         {
           "date": "2026-08-17",
-          "predicted_price": 336517.69
+          "predicted_price": 343165.99
         },
         {
           "date": "2026-08-18",
-          "predicted_price": 336228.02
+          "predicted_price": 343197.53
+        },
+        {
+          "date": "2026-08-19",
+          "predicted_price": 343048.96
         }
       ]
     },
     "silver": {
       "ticker": "SI=F",
-      "current_price": 5256.56,
+      "current_price": 5486.3,
       "model": "LSTM (60-day lookback)",
-      "rmse": 330.01,
-      "mape_percent": 4.28,
+      "rmse": 383.44,
+      "mape_percent": 4.68,
       "history": [
-        4981.58,
         4797.23,
         4868.45,
         4853.18,
@@ -73,36 +72,37 @@
         4984.65,
         5154.22,
         5099.44,
-        5256.56
+        5256.56,
+        5486.3
       ],
       "forecast": [
         {
-          "date": "2026-08-10",
-          "predicted_price": 5114.46
-        },
-        {
           "date": "2026-08-11",
-          "predicted_price": 5168.41
+          "predicted_price": 5022.33
         },
         {
           "date": "2026-08-12",
-          "predicted_price": 5209.08
+          "predicted_price": 5063.0
         },
         {
           "date": "2026-08-13",
-          "predicted_price": 5243.11
+          "predicted_price": 5088.73
         },
         {
           "date": "2026-08-14",
-          "predicted_price": 5272.16
+          "predicted_price": 5105.33
         },
         {
           "date": "2026-08-17",
-          "predicted_price": 5298.72
+          "predicted_price": 5116.12
         },
         {
           "date": "2026-08-18",
-          "predicted_price": 5324.45
+          "predicted_price": 5121.93
+        },
+        {
+          "date": "2026-08-19",
+          "predicted_price": 5125.25
         }
       ]
     }
